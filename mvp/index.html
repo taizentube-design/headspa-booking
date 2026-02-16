@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ヘッドスパ予約・紹介｜関東のヘッドスパを地域から探す</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif; background: #f8f7f4; color: #333; line-height: 1.6; }
+    .header { background: #2d2d2d; color: #fff; padding: 1rem 1.5rem; }
+    .header h1 { margin: 0; font-size: 1.25rem; font-weight: 600; }
+    .header p { margin: 0.25rem 0 0; font-size: 0.8rem; opacity: 0.9; }
+    .main { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .lead { font-size: 1.1rem; margin-bottom: 1.5rem; color: #555; }
+    .area-section h2 { font-size: 1rem; margin-bottom: 1rem; color: #555; font-weight: 600; }
+    .area-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 0.75rem; }
+    .area-btn { display: block; padding: 1rem; background: #fff; border: 1px solid #e0ddd8; border-radius: 8px; text-align: center; text-decoration: none; color: #333; font-weight: 500; transition: border-color .2s, box-shadow .2s; }
+    .area-btn:hover { border-color: #c9c5be; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+    .pickup-section { margin-top: 2.5rem; padding-top: 2rem; border-top: 1px solid #e8e6e2; }
+    .pickup-section h2 { font-size: 1.1rem; margin-bottom: 1rem; }
+    .store-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+    .store-card { background: #fff; border: 1px solid #e0ddd8; border-radius: 8px; padding: 1.25rem; text-decoration: none; color: inherit; display: block; transition: box-shadow .2s; }
+    .store-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+    .store-card h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+    .store-card .meta { font-size: 0.85rem; color: #666; }
+    .store-card .detail-link { font-size: 0.85rem; margin-top: 0.75rem; color: #0066cc; }
+    .footer { max-width: 900px; margin: 0 auto; padding: 1.5rem; font-size: 0.8rem; color: #888; border-top: 1px solid #e8e6e2; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>ヘッドスパ予約・紹介</h1>
+    <p>関東のヘッドスパを地域から探せるサイト（MVP）</p>
+  </header>
+
+  <main class="main">
+    <p class="lead">関東のヘッドスパを地域から探す</p>
+
+    <section class="area-section">
+      <h2>エリアを選ぶ</h2>
+      <div class="area-grid">
+        <a class="area-btn" href="tokyo.html">東京</a>
+        <a class="area-btn" href="#">神奈川</a>
+        <a class="area-btn" href="#">埼玉</a>
+        <a class="area-btn" href="#">千葉</a>
+        <a class="area-btn" href="#">茨城</a>
+        <a class="area-btn" href="#">栃木</a>
+        <a class="area-btn" href="#">群馬</a>
+      </div>
+    </section>
+
+    <section class="pickup-section">
+      <h2>おすすめ・ピックアップ</h2>
+      <p style="font-size: 0.9rem; color: #666; margin-bottom: 1rem;">有料ピックアップ枠（サンプル表示）</p>
+      <div class="store-cards" id="pickup-cards">
+        <p style="color:#666;">読み込み中…</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    ヘッドスパ予約・紹介（MVP）｜関東からスタート、続いて関西展開予定<br>
+    当サイトでは提携・アフィリエイトリンクを利用している場合があります。該当箇所に「PR」表記をしています。
+  </footer>
+  <script>
+    (function () {
+      var el = document.getElementById('pickup-cards');
+      fetch('../data/stores.json')
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+        .then(function (stores) {
+          var list = stores.filter(function (s) { return s.area === '東京'; }).slice(0, 3);
+          el.innerHTML = list.map(function (s) {
+            var meta = s.address ? s.address.replace(/^東京都/, '東京都') : '—';
+            return '<a class="store-card" href="store.html?id=' + s.id + '"><h3>' + escapeHtml(s.name) + '</h3><p class="meta">' + escapeHtml(meta) + '</p><span class="detail-link">詳細を見る →</span></a>';
+          }).join('');
+        })
+        .catch(function () { el.innerHTML = '<p style="color:#666;">表示できませんでした。</p>'; });
+      function escapeHtml(s) {
+        if (!s) return '';
+        var div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+      }
+    })();
+  </script>
+</body>
+</html>

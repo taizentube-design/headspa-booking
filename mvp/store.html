@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>店舗詳細｜ヘッドスパ予約・紹介</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif; background: #f8f7f4; color: #333; line-height: 1.6; }
+    .header { background: #2d2d2d; color: #fff; padding: 1rem 1.5rem; }
+    .header a { color: #fff; text-decoration: none; font-size: 0.9rem; opacity: 0.9; }
+    .header h1 { margin: 0.25rem 0 0; font-size: 1.25rem; font-weight: 600; }
+    .main { max-width: 700px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .store-detail { background: #fff; border: 1px solid #e0ddd8; border-radius: 8px; padding: 2rem; }
+    .store-detail h2 { margin: 0 0 1rem; font-size: 1.35rem; }
+    .info-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
+    .info-table th { text-align: left; padding: 0.5rem 0; width: 100px; color: #666; font-weight: 500; font-size: 0.9rem; }
+    .info-table td { padding: 0.5rem 0; }
+    .store-detail .description { margin: 1.5rem 0; padding: 1rem; background: #f8f7f4; border-radius: 6px; font-size: 0.95rem; }
+    .store-detail .citation { font-size: 0.8rem; color: #888; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e8e6e2; }
+    .btn-wrap { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; align-items: center; }
+    .btn { display: inline-block; padding: 0.75rem 1.25rem; background: #2d2d2d; color: #fff; text-decoration: none; border-radius: 6px; font-size: 0.9rem; }
+    .btn.sub { background: #fff; color: #0066cc; border: 1px solid #0066cc; }
+    .pr-tag { font-size: 0.75rem; color: #888; margin-left: 0.25rem; }
+    .footer { max-width: 700px; margin: 0 auto; padding: 1.5rem; font-size: 0.8rem; color: #888; border-top: 1px solid #e8e6e2; }
+    .load-err { padding: 2rem; text-align: center; color: #666; }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <a href="tokyo.html">← 東京一覧へ</a>
+    <h1 id="header-title">—</h1>
+  </header>
+
+  <main class="main">
+    <div id="content">
+      <p class="load-err">読み込み中…</p>
+    </div>
+  </main>
+
+  <footer class="footer">
+    ヘッドスパ予約・紹介（MVP）｜店舗詳細<br>
+    当サイトでは提携・アフィリエイトリンクを利用している場合があります。該当する予約リンクには「PR」表記を付けています。
+  </footer>
+  <script>
+    (function () {
+      var params = new URLSearchParams(document.location.search);
+      var id = params.get('id');
+      var contentEl = document.getElementById('content');
+      var titleEl = document.getElementById('header-title');
+
+      if (!id) {
+        contentEl.innerHTML = '<p class="load-err">店舗が指定されていません。</p>';
+        titleEl.textContent = '店舗詳細';
+        return;
+      }
+
+      fetch('../data/stores.json')
+        .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('fetch')); })
+        .then(function (stores) {
+          var store = stores.filter(function (s) { return String(s.id) === String(id); })[0];
+          if (!store) {
+            contentEl.innerHTML = '<p class="load-err">該当する店舗が見つかりません。</p>';
+            titleEl.textContent = '店舗詳細';
+            return;
+          }
+
+          document.title = store.name + '｜ヘッドスパ予約・紹介';
+          titleEl.textContent = store.name;
+
+          var rows = '';
+          if (store.address) rows += '<tr><th>住所</th><td>' + escapeHtml(store.address) + '</td></tr>';
+          if (store.tel) rows += '<tr><th>電話</th><td><a href="tel:' + escapeHtml(store.tel).replace(/\s/g, '') + '">' + escapeHtml(store.tel) + '</a></td></tr>';
+          if (store.hours) rows += '<tr><th>営業時間</th><td>' + escapeHtml(store.hours) + '</td></tr>';
+
+          var btns = '';
+          if (store.hpb_url) btns += '<a class="btn" href="' + escapeAttr(store.hpb_url) + '" target="_blank" rel="noopener">予約はこちら（ホットペッパー）</a><span class="pr-tag">PR</span>';
+          if (store.official_url) btns += '<a class="btn sub" href="' + escapeAttr(store.official_url) + '" target="_blank" rel="noopener">公式サイト</a>';
+          if (store.inquiry_url) btns += '<a class="btn sub" href="' + escapeAttr(store.inquiry_url) + '" target="_blank" rel="noopener">問い合わせ</a>';
+          if (store.tel) btns += '<a class="btn sub" href="tel:' + escapeAttr(store.tel).replace(/\s/g, '') + '">電話する</a>';
+
+          contentEl.innerHTML =
+            '<div class="store-detail">' +
+              '<h2>' + escapeHtml(store.name) + '</h2>' +
+              (rows ? '<table class="info-table">' + rows + '</table>' : '') +
+              (btns ? '<div class="btn-wrap">' + btns + '</div>' : '') +
+              (store.description ? '<div class="description">' + escapeHtml(store.description) + '</div>' : '') +
+              (store.citation ? '<p class="citation">※ 上記の店舗説明は、' + escapeHtml(store.citation) + '</p>' : '') +
+            '</div>';
+        })
+        .catch(function () {
+          contentEl.innerHTML = '<p class="load-err">データを取得できませんでした。GitHub Pages で開いている場合は、しばらく待ってから再読み込みしてください。</p>';
+          titleEl.textContent = '店舗詳細';
+        });
+
+      function escapeHtml(s) {
+        if (!s) return '';
+        var div = document.createElement('div');
+        div.textContent = s;
+        return div.innerHTML;
+      }
+      function escapeAttr(s) {
+        if (!s) return '';
+        return String(s)
+          .replace(/&/g, '&amp;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+      }
+    })();
+  </script>
+</body>
+</html>
