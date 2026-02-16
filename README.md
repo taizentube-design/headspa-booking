@@ -11,9 +11,9 @@
 ### GitHub Pages の有効化手順
 
 1. リポジトリの **Settings** → **Pages**
-2. **Source** で **Deploy from a branch** を選択
-3. **Branch**: `main`、**Folder**: **/ (root)** → **Save**
-4. 1〜2分待つとサイトが公開されます
+2. **Source** で **「GitHub Actions」** を選択（Deploy from a branch ではない）
+3. このリポジトリには `.github/workflows/deploy-pages.yml` が入っており、push のたびに自動でデプロイされます
+4. **Actions** タブで「Deploy to GitHub Pages」が成功（緑✓）になったら、1〜2分後にサイトが表示されます
 
 ## 構成
 
