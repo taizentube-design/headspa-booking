@@ -9,17 +9,23 @@
     body { margin: 0; font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", sans-serif; background: #f8f7f4; color: #333; line-height: 1.6; }
     .header { background: #2d2d2d; color: #fff; padding: 1rem 1.5rem; }
     .header a { color: #fff; text-decoration: none; font-size: 0.9rem; opacity: 0.9; }
-    .header h1 { margin: 0.25rem 0 0; font-size: 1.25rem; font-weight: 600; }
+    .header .header-title { margin: 0.25rem 0 0; font-size: 1.25rem; font-weight: 600; }
     .main { max-width: 700px; margin: 0 auto; padding: 2rem 1.5rem; }
     .store-detail { background: #fff; border: 1px solid #e0ddd8; border-radius: 8px; padding: 2rem; }
-    .store-detail h2 { margin: 0 0 1rem; font-size: 1.35rem; }
-    .info-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
-    .info-table th { text-align: left; padding: 0.5rem 0; width: 100px; color: #666; font-weight: 500; font-size: 0.9rem; }
-    .info-table td { padding: 0.5rem 0; }
-    .store-detail .description { margin: 1.5rem 0; padding: 1rem; background: #f8f7f4; border-radius: 6px; font-size: 0.95rem; }
-    .store-detail .citation { font-size: 0.8rem; color: #888; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e8e6e2; }
     .store-detail .store-image { width: 100%; max-height: 420px; object-fit: contain; object-position: center; background: #f2f0ec; border-radius: 8px; margin-bottom: 1.5rem; display: block; }
-    .btn-wrap { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; align-items: center; }
+    .store-detail h1 { margin: 0 0 1rem; font-size: 1.35rem; font-weight: 600; }
+    .store-detail h2 { margin: 1.5rem 0 0.75rem; font-size: 1.15rem; font-weight: 600; border-bottom: 1px solid #e8e6e2; padding-bottom: 0.35rem; }
+    .store-detail h2:first-of-type { margin-top: 0; }
+    .store-detail h3 { margin: 1rem 0 0.5rem; font-size: 1rem; font-weight: 600; }
+    .info-table { width: 100%; border-collapse: collapse; margin-bottom: 0; }
+    .info-table th { text-align: left; padding: 0.5rem 0; width: 100px; color: #666; font-weight: 500; font-size: 0.9rem; vertical-align: top; }
+    .info-table td { padding: 0.5rem 0; }
+    .store-detail .description { margin: 1rem 0 0; padding: 1rem; background: #f8f7f4; border-radius: 6px; font-size: 0.95rem; }
+    .store-detail .citation { font-size: 0.8rem; color: #888; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e8e6e2; }
+    .feature-tags { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.5rem 0 0; }
+    .feature-tags span { background: #f0eeea; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem; }
+    .price-note { margin: 0.5rem 0 0; font-size: 0.95rem; }
+    .btn-wrap { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem; align-items: center; }
     .btn { display: inline-block; padding: 0.75rem 1.25rem; background: #2d2d2d; color: #fff; text-decoration: none; border-radius: 6px; font-size: 0.9rem; }
     .btn.sub { background: #fff; color: #0066cc; border: 1px solid #0066cc; }
     .pr-tag { font-size: 0.75rem; color: #888; margin-left: 0.25rem; }
@@ -30,7 +36,7 @@
 <body>
   <header class="header">
     <a href="tokyo.html">← 東京一覧へ</a>
-    <h1 id="header-title">—</h1>
+    <p class="header-title" id="header-title">—</p>
   </header>
 
   <main class="main">
@@ -66,29 +72,85 @@
             return;
           }
 
-          document.title = store.name + '｜ヘッドスパ予約・紹介';
+          document.title = store.name + '｜' + (store.district ? store.district + 'のヘッドスパ｜' : '') + 'ヘッドスパ予約・紹介';
           titleEl.textContent = store.name;
 
-          var rows = '';
-          if (store.address) rows += '<tr><th>住所</th><td>' + escapeHtml(store.address) + '</td></tr>';
-          if (store.tel) rows += '<tr><th>電話</th><td><a href="tel:' + escapeHtml(store.tel).replace(/\s/g, '') + '">' + escapeHtml(store.tel) + '</a></td></tr>';
-          if (store.hours) rows += '<tr><th>営業時間</th><td>' + escapeHtml(store.hours) + '</td></tr>';
+          var html = '';
 
-          var btns = '';
-          if (store.hpb_url) btns += '<a class="btn" href="' + escapeAttr(store.hpb_url) + '" target="_blank" rel="noopener">予約はこちら（ホットペッパー）</a><span class="pr-tag">PR</span>';
-          if (store.official_url) btns += '<a class="btn sub" href="' + escapeAttr(store.official_url) + '" target="_blank" rel="noopener">公式サイト</a>';
-          if (store.inquiry_url) btns += '<a class="btn sub" href="' + escapeAttr(store.inquiry_url) + '" target="_blank" rel="noopener">問い合わせ</a>';
-          if (store.tel) btns += '<a class="btn sub" href="tel:' + escapeAttr(store.tel).replace(/\s/g, '') + '">電話する</a>';
+          if (store.image_url) {
+            html += '<img class="store-image" src="' + escapeAttr(store.image_url) + '" alt="' + escapeAttr(store.name) + '" loading="lazy">';
+          }
 
-          contentEl.innerHTML =
-            '<div class="store-detail">' +
-              (store.image_url ? '<img class="store-image" src="' + escapeAttr(store.image_url) + '" alt="' + escapeAttr(store.name) + '" loading="lazy">' : '') +
-              '<h2>' + escapeHtml(store.name) + '</h2>' +
-              (rows ? '<table class="info-table">' + rows + '</table>' : '') +
-              (btns ? '<div class="btn-wrap">' + btns + '</div>' : '') +
-              (store.description ? '<div class="description">' + escapeHtml(store.description) + '</div>' : '') +
-              (store.citation ? '<p class="citation">※ 上記の店舗説明は、' + escapeHtml(store.citation) + '</p>' : '') +
-            '</div>';
+          html += '<h1>' + escapeHtml(store.name) + '</h1>';
+
+          var hasAccess = store.nearest_station || store.address || store.access_note;
+          if (hasAccess) {
+            html += '<h2>アクセス</h2><table class="info-table">';
+            if (store.nearest_station && store.walk_minutes) {
+              html += '<tr><th>最寄り駅</th><td>' + escapeHtml(store.nearest_station) + ' 徒歩' + escapeHtml(String(store.walk_minutes)) + '分</td></tr>';
+            } else if (store.nearest_station) {
+              html += '<tr><th>最寄り駅</th><td>' + escapeHtml(store.nearest_station) + '</td></tr>';
+            }
+            if (store.address) html += '<tr><th>住所</th><td>' + escapeHtml(store.address) + '</td></tr>';
+            if (store.access_note) html += '<tr><th>アクセス補足</th><td>' + escapeHtml(store.access_note) + '</td></tr>';
+            html += '</table>';
+          }
+
+          var hasHours = store.hours || store.closed || store.hours_note;
+          if (hasHours) {
+            html += '<h2>営業情報</h2><table class="info-table">';
+            if (store.hours) html += '<tr><th>営業時間</th><td>' + escapeHtml(store.hours) + '</td></tr>';
+            if (store.closed) html += '<tr><th>定休日</th><td>' + escapeHtml(store.closed) + '</td></tr>';
+            if (store.hours_note) html += '<tr><th>補足</th><td>' + escapeHtml(store.hours_note) + '</td></tr>';
+            html += '</table>';
+          }
+
+          var hasFeatures = (store.features && store.features.length) || store.price_note || store.description;
+          if (hasFeatures) {
+            html += '<h2>この店の特徴</h2>';
+            if (store.features && store.features.length) {
+              html += '<h3>特徴</h3><div class="feature-tags">';
+              for (var i = 0; i < store.features.length; i++) {
+                html += '<span>' + escapeHtml(store.features[i]) + '</span>';
+              }
+              html += '</div>';
+            }
+            if (store.price_note) {
+              html += '<h3>料金の目安</h3><p class="price-note">' + escapeHtml(store.price_note) + '</p>';
+            }
+            if (store.description) {
+              html += '<h3>店舗説明</h3><div class="description">' + escapeHtml(store.description) + '</div>';
+            }
+          }
+
+          var hasOther = store.payment || store.parking;
+          if (hasOther) {
+            html += '<h2>その他</h2><table class="info-table">';
+            if (store.payment) html += '<tr><th>支払い</th><td>' + escapeHtml(store.payment) + '</td></tr>';
+            if (store.parking) html += '<tr><th>駐車場</th><td>' + escapeHtml(store.parking) + '</td></tr>';
+            html += '</table>';
+          }
+
+          if (store.tel) {
+            html += '<h2>連絡先</h2><table class="info-table">';
+            html += '<tr><th>電話</th><td><a href="tel:' + escapeAttr(store.tel).replace(/\s/g, '') + '">' + escapeHtml(store.tel) + '</a></td></tr></table>';
+          }
+
+          var hasBtns = store.hpb_url || store.official_url || store.inquiry_url || store.tel;
+          if (hasBtns) {
+            html += '<h2>予約</h2><div class="btn-wrap">';
+            if (store.hpb_url) html += '<a class="btn" href="' + escapeAttr(store.hpb_url) + '" target="_blank" rel="noopener">予約はこちら（ホットペッパー）</a><span class="pr-tag">PR</span>';
+            if (store.official_url) html += '<a class="btn sub" href="' + escapeAttr(store.official_url) + '" target="_blank" rel="noopener">公式サイト</a>';
+            if (store.inquiry_url) html += '<a class="btn sub" href="' + escapeAttr(store.inquiry_url) + '" target="_blank" rel="noopener">問い合わせ</a>';
+            if (store.tel) html += '<a class="btn sub" href="tel:' + escapeAttr(store.tel).replace(/\s/g, '') + '">電話する</a>';
+            html += '</div>';
+          }
+
+          if (store.citation) {
+            html += '<p class="citation">※ 上記の店舗説明は、' + escapeHtml(store.citation) + '</p>';
+          }
+
+          contentEl.innerHTML = '<div class="store-detail">' + html + '</div>';
         })
         .catch(function () {
           contentEl.innerHTML = '<p class="load-err">データを取得できませんでした。GitHub Pages で開いている場合は、しばらく待ってから再読み込みしてください。</p>';
