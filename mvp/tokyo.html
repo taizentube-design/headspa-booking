@@ -22,6 +22,7 @@
     .store-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); }
     .store-card h3 { margin: 0 0 0.5rem; font-size: 1.1rem; font-weight: 600; }
     .store-card .meta { font-size: 0.9rem; color: #666; margin-bottom: 0.75rem; }
+    .store-card .store-thumb { width: 100%; height: 140px; object-fit: cover; border-radius: 6px 6px 0 0; margin: -1.25rem -1.25rem 0.75rem -1.25rem; display: block; }
     .store-card .actions { display: flex; gap: 1rem; flex-wrap: wrap; }
     .store-card .btn { font-size: 0.85rem; color: #0066cc; }
     .district-title { font-size: 1.1rem; font-weight: 600; color: #333; margin: 0 0 1rem; }
@@ -66,10 +67,21 @@
         div.textContent = s;
         return div.innerHTML;
       }
+      function escapeAttr(s) {
+        if (!s) return '';
+        return String(s)
+          .replace(/&/g, '&amp;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;');
+      }
 
       function renderStoreCard(s) {
         var meta = (s.address ? s.address.replace(/^東京都/, '') : '') + (s.hours && s.hours !== '要確認' ? '・営業時間 ' + s.hours : '');
+        var thumb = s.image_url ? '<img class="store-thumb" src="' + escapeAttr(s.image_url) + '" alt="" loading="lazy">' : '';
         return '<a class="store-card" href="store.html?id=' + s.id + '">' +
+          thumb +
           '<h3>' + escapeHtml(s.name) + '</h3>' +
           '<p class="meta">' + escapeHtml(meta || '—') + '</p>' +
           '<div class="actions"><span class="btn">詳細を見る →</span><span class="btn">予約・電話</span></div>' +

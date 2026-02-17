@@ -18,6 +18,7 @@
     .info-table td { padding: 0.5rem 0; }
     .store-detail .description { margin: 1.5rem 0; padding: 1rem; background: #f8f7f4; border-radius: 6px; font-size: 0.95rem; }
     .store-detail .citation { font-size: 0.8rem; color: #888; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid #e8e6e2; }
+    .store-detail .store-image { width: 100%; max-height: 320px; object-fit: cover; border-radius: 8px; margin-bottom: 1.5rem; display: block; }
     .btn-wrap { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; align-items: center; }
     .btn { display: inline-block; padding: 0.75rem 1.25rem; background: #2d2d2d; color: #fff; text-decoration: none; border-radius: 6px; font-size: 0.9rem; }
     .btn.sub { background: #fff; color: #0066cc; border: 1px solid #0066cc; }
@@ -81,6 +82,7 @@
 
           contentEl.innerHTML =
             '<div class="store-detail">' +
+              (store.image_url ? '<img class="store-image" src="' + escapeAttr(store.image_url) + '" alt="' + escapeAttr(store.name) + '" loading="lazy">' : '') +
               '<h2>' + escapeHtml(store.name) + '</h2>' +
               (rows ? '<table class="info-table">' + rows + '</table>' : '') +
               (btns ? '<div class="btn-wrap">' + btns + '</div>' : '') +

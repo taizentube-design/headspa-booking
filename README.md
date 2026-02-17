@@ -75,3 +75,40 @@ git add .
 git commit -m "渋谷の店舗を追加"
 git push origin main
 ```
+
+※ **1行ずつ実行しても、上記4行をまとめて貼り付けて一気に実行してもOK** です。ターミナルは貼り付けた行を上から順に実行します。
+
+---
+
+## プッシュしたのにサイトに反映されないとき
+
+**プッシュは成功している場合**（`main -> main` と表示されていればOK）、以下を順に確認してください。
+
+### 1. GitHub Actions が成功しているか
+
+1. ブラウザで **https://github.com/taizentube-design/headspa-booking** を開く  
+2. 上部の **「Actions」** タブをクリック  
+3. 一番上にある「Deploy to GitHub Pages」の実行が **緑の✓（成功）** になっているか確認  
+
+- **失敗（赤い×）になっている場合**  
+  → その実行を開き、どのステップで失敗したか確認する。よくあるのは「Settings → Pages → Source」が **GitHub Actions** になっていないことです。  
+- **成功している場合**  
+  → デプロイは完了しているので、次の 2 に進む。
+
+### 2. Pages の公開元が「GitHub Actions」か
+
+1. リポジトリの **Settings** → 左の **Pages**  
+2. **Build and deployment** の **Source** が **「GitHub Actions」** になっているか確認  
+
+- 「Deploy from a branch」のままになっていると、`main` へのプッシュではサイトが更新されません。**Source を「GitHub Actions」に変更**して保存する。
+
+### 3. ブラウザのキャッシュ
+
+- **強制再読み込み**：Mac は **Cmd + Shift + R**、Windows は **Ctrl + Shift + R**  
+- または **シークレット（プライベート）ウィンドウ**で開き直す  
+- **別のブラウザ**で開いてみる  
+
+### 4. 見ているURL
+
+- 正しいURL：**https://taizentube-design.github.io/headspa-booking/**  
+- トップは自動で `mvp/` に飛びます。東京一覧は「東京」を押した先のページです。
