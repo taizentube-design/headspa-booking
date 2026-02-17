@@ -12,10 +12,12 @@
     .header h1 { margin: 0.25rem 0 0; font-size: 1.25rem; font-weight: 600; }
     .header .count { font-size: 0.85rem; opacity: 0.9; margin-top: 0.25rem; }
     .main { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+    .district-section { margin-bottom: 2rem; }
+    .district-section h2 { font-size: 1.1rem; font-weight: 600; color: #555; margin: 0 0 0.75rem; padding-bottom: 0.35rem; border-bottom: 2px solid #2d2d2d; }
     .store-list { display: flex; flex-direction: column; gap: 1rem; }
     .store-card { background: #fff; border: 1px solid #e0ddd8; border-radius: 8px; padding: 1.25rem; text-decoration: none; color: inherit; display: block; transition: box-shadow .2s; }
     .store-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,.08); }
-    .store-card h2 { margin: 0 0 0.5rem; font-size: 1.1rem; font-weight: 600; }
+    .store-card h3 { margin: 0 0 0.5rem; font-size: 1.1rem; font-weight: 600; }
     .store-card .meta { font-size: 0.9rem; color: #666; margin-bottom: 0.75rem; }
     .store-card .actions { display: flex; gap: 1rem; flex-wrap: wrap; }
     .store-card .btn { font-size: 0.85rem; color: #0066cc; }
@@ -31,7 +33,7 @@
   </header>
 
   <main class="main">
-    <div class="store-list" id="store-list">
+    <div id="store-list">
       <p class="load-err">読み込み中…</p>
     </div>
   </main>
@@ -44,18 +46,34 @@
     (function () {
       var listEl = document.getElementById('store-list');
       var countEl = document.getElementById('count');
+      var districtOrder = ['渋谷', '新宿', '銀座', '表参道', '恵比寿', '池袋', '品川', 'その他'];
       fetch('../data/stores.json')
         .then(function (r) { return r.ok ? r.json() : Promise.reject(new Error('fetch')); })
         .then(function (stores) {
           var tokyo = stores.filter(function (s) { return s.area === '東京'; });
           countEl.textContent = tokyo.length + '件';
-          listEl.innerHTML = tokyo.map(function (s) {
-            var meta = (s.address ? s.address.replace(/^東京都/, '') : '') + (s.hours && s.hours !== '要確認' ? '・営業時間 ' + s.hours : '');
-            return '<a class="store-card" href="store.html?id=' + s.id + '">' +
-              '<h2>' + escapeHtml(s.name) + '</h2>' +
-              '<p class="meta">' + escapeHtml(meta || '—') + '</p>' +
-              '<div class="actions"><span class="btn">詳細を見る →</span><span class="btn">予約・電話</span></div>' +
-              '</a>';
+          var byDistrict = {};
+          tokyo.forEach(function (s) {
+            var d = s.district || 'その他';
+            if (!byDistrict[d]) byDistrict[d] = [];
+            byDistrict[d].push(s);
+          });
+          var order = [];
+          districtOrder.forEach(function (d) { if (byDistrict[d]) order.push(d); });
+          Object.keys(byDistrict).forEach(function (d) {
+            if (order.indexOf(d) === -1) order.push(d);
+          });
+          listEl.innerHTML = order.map(function (district) {
+            var list = byDistrict[district];
+            var cards = list.map(function (s) {
+              var meta = (s.address ? s.address.replace(/^東京都/, '') : '') + (s.hours && s.hours !== '要確認' ? '・営業時間 ' + s.hours : '');
+              return '<a class="store-card" href="store.html?id=' + s.id + '">' +
+                '<h3>' + escapeHtml(s.name) + '</h3>' +
+                '<p class="meta">' + escapeHtml(meta || '—') + '</p>' +
+                '<div class="actions"><span class="btn">詳細を見る →</span><span class="btn">予約・電話</span></div>' +
+                '</a>';
+            }).join('');
+            return '<section class="district-section"><h2>' + escapeHtml(district) + 'のヘッドスパ</h2><div class="store-list">' + cards + '</div></section>';
           }).join('');
         })
         .catch(function () {
